@@ -6,12 +6,14 @@ resource "azurerm_cosmosdb_account" "this" {
   kind       = "GlobalDocumentDB"
   offer_type = "Standard"
 
-  automatic_failover_enabled    = var.automatic_failover_enabled
-  public_network_access_enabled = var.public_network_access_enabled
-  minimal_tls_version           = "TLS1_2"
-  disable_local_auth            = var.disable_local_auth
+  automatic_failover_enabled     = var.automatic_failover_enabled
+  public_network_access_enabled  = var.public_network_access_enabled
+  minimal_tls_version            = "TLS1_2"
 
-  # Keep it simple: Session consistency (same as your draft)
+  # v4 attribute name
+  local_authentication_disabled  = var.disable_local_auth
+
+  # Consistency
   consistency_policy {
     consistency_level       = "Session"
     max_interval_in_seconds = 5
@@ -32,13 +34,12 @@ resource "azurerm_cosmosdb_account" "this" {
     }
   }
 
+  # v4 backup shape (no nested periodic block)
   backup {
-    type = "Periodic"
-    periodic {
-      interval_in_minutes = var.backup_interval_minutes
-      retention_in_hours  = var.backup_retention_hours
-      storage_redundancy  = var.backup_storage_redundancy
-    }
+    type                 = "Periodic"
+    interval_in_minutes  = var.backup_interval_minutes
+    retention_in_hours   = var.backup_retention_hours
+    storage_redundancy   = var.backup_storage_redundancy
   }
 
   tags = var.tags
@@ -73,11 +74,11 @@ locals {
 }
 
 resource "azurerm_cosmosdb_sql_container" "container" {
-  for_each            = local.containers
-  name                = each.value.container_name
-  resource_group_name = var.rg_name
-  account_name        = azurerm_cosmosdb_account.this.name
-  database_name       = azurerm_cosmosdb_sql_database.db[each.value.db_name].name
+  for_each              = local.containers
+  name                  = each.value.container_name
+  resource_group_name   = var.rg_name
+  account_name          = azurerm_cosmosdb_account.this.name
+  database_name         = azurerm_cosmosdb_sql_database.db[each.value.db_name].name
 
   partition_key_path    = each.value.partition_key_path
   partition_key_version = each.value.partition_key_version
@@ -87,16 +88,11 @@ resource "azurerm_cosmosdb_sql_container" "container" {
 
     dynamic "included_path" {
       for_each = toset(each.value.indexing_included)
-      content {
-        path = included_path.value
-      }
+      content { path = included_path.value }
     }
-
     dynamic "excluded_path" {
       for_each = toset(each.value.indexing_excluded)
-      content {
-        path = excluded_path.value
-      }
+      content { path = excluded_path.value }
     }
   }
 }
