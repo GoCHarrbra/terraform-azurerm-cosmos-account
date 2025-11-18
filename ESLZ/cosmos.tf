@@ -7,15 +7,32 @@ variable "cosmos" {
     account_name                   = string
     tags                           = map(string)
 
+    # Account shape
+    kind                           = string               # e.g., "GlobalDocumentDB"
+    offer_type                     = string               # e.g., "Standard"
+    minimal_tls_version            = string               # "Tls" | "Tls11" | "Tls12"
+
+    # Security / networking
     disable_local_auth             = bool
     public_network_access_enabled  = bool
+
+    # Resiliency / capacity
     automatic_failover_enabled     = bool
     enable_serverless              = bool
+    additional_read_locations      = list(string)         # [] or e.g., ["canadaeast"]
 
-    backup_interval_minutes        = number
-    backup_retention_hours         = number
-    backup_storage_redundancy      = string     # Local | Zone | Geo
+    # Consistency
+    consistency_level                 = string            # Session | Strong | BoundedStaleness | ConsistentPrefix | Eventual
+    consistency_max_interval_seconds  = number
+    consistency_max_staleness_prefix  = number
 
+    # Backup (azurerm v4)
+    backup_type                    = string               # Periodic | Continuous7Days | Continuous30Days
+    backup_interval_minutes        = number               # used for Periodic
+    backup_retention_hours         = number               # used for Periodic
+    backup_storage_redundancy      = string               # Local | Zone | Geo
+
+    # DBs/containers
     databases = map(object({
       name       = string
       containers = map(object({
@@ -36,15 +53,32 @@ module "cosmos" {
   account_name                  = var.cosmos.account_name
   tags                          = var.cosmos.tags
 
+  # Account shape
+  kind                          = var.cosmos.kind
+  offer_type                    = var.cosmos.offer_type
+  minimal_tls_version           = var.cosmos.minimal_tls_version
+
+  # Security / networking
   disable_local_auth            = var.cosmos.disable_local_auth
   public_network_access_enabled = var.cosmos.public_network_access_enabled
+
+  # Resiliency / capacity
   automatic_failover_enabled    = var.cosmos.automatic_failover_enabled
   enable_serverless             = var.cosmos.enable_serverless
+  additional_read_locations     = var.cosmos.additional_read_locations
 
-  backup_interval_minutes       = var.cosmos.backup_interval_minutes
-  backup_retention_hours        = var.cosmos.backup_retention_hours
-  backup_storage_redundancy     = var.cosmos.backup_storage_redundancy
+  # Consistency
+  consistency_level                 = var.cosmos.consistency_level
+  consistency_max_interval_seconds  = var.cosmos.consistency_max_interval_seconds
+  consistency_max_staleness_prefix  = var.cosmos.consistency_max_staleness_prefix
 
+  # Backup (azurerm v4)
+  backup_type                    = var.cosmos.backup_type
+  backup_interval_minutes        = var.cosmos.backup_interval_minutes
+  backup_retention_hours         = var.cosmos.backup_retention_hours
+  backup_storage_redundancy      = var.cosmos.backup_storage_redundancy
+
+  # DBs/containers
   databases                     = var.cosmos.databases
 }
 
