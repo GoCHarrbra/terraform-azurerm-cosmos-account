@@ -1,23 +1,21 @@
-
 # All fields required; must be set in cosmos.tfvars
 variable "cosmos" {
   description = "Settings for the Cosmos DB account and its SQL databases/containers."
   type = object({
-    rg_name                      = string
-    location                     = string
-    account_name                 = string
-    tags                         = map(string)
+    rg_name                        = string
+    location                       = string
+    account_name                   = string
+    tags                           = map(string)
 
-    disable_local_auth           = bool
-    public_network_access_enabled = bool
-    automatic_failover_enabled   = bool
-    enable_serverless            = bool
+    disable_local_auth             = bool
+    public_network_access_enabled  = bool
+    automatic_failover_enabled     = bool
+    enable_serverless              = bool
 
-    backup_interval_minutes      = number
-    backup_retention_hours       = number
-    backup_storage_redundancy    = string     # Local | Zone | Geo
+    backup_interval_minutes        = number
+    backup_retention_hours         = number
+    backup_storage_redundancy      = string     # Local | Zone | Geo
 
-    # Map of SQL databases and containers
     databases = map(object({
       name       = string
       containers = map(object({
@@ -50,7 +48,7 @@ module "cosmos" {
   databases                     = var.cosmos.databases
 }
 
-# Useful outputs for downstream layers
+# Useful outputs for downstream layers (match module outputs)
 output "account_id" {
   description = "Cosmos DB account resource ID."
   value       = module.cosmos.account_id
@@ -59,4 +57,19 @@ output "account_id" {
 output "account_name" {
   description = "Cosmos DB account name."
   value       = module.cosmos.account_name
+}
+
+output "rg_name" {
+  description = "Resource group used for the Cosmos account."
+  value       = module.cosmos.rg_name
+}
+
+output "location" {
+  description = "Location used for the Cosmos account."
+  value       = module.cosmos.location
+}
+
+output "tags" {
+  description = "Tags applied to the Cosmos account."
+  value       = module.cosmos.tags
 }
