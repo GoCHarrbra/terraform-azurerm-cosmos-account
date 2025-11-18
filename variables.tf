@@ -4,7 +4,7 @@ variable "rg_name" {
 }
 
 variable "location" {
-  description = "Azure region (e.g., canadacentral)."
+  description = "Primary Azure region (write region), e.g., canadacentral."
   type        = string
 }
 
@@ -16,72 +16,105 @@ variable "account_name" {
 variable "tags" {
   description = "Tags to apply to Cosmos resources."
   type        = map(string)
-  default     = {}
+}
+
+# Account shape & access
+variable "kind" {
+  description = "Cosmos account kind. Typically GlobalDocumentDB."
+  type        = string
+}
+
+variable "offer_type" {
+  description = "Offer type; for SQL API use 'Standard'."
+  type        = string
+}
+
+variable "minimal_tls_version" {
+  description = "Minimum TLS version (Tls, Tls11, Tls12)."
+  type        = string
+  validation {
+    condition     = contains(["Tls", "Tls11", "Tls12"], var.minimal_tls_version)
+    error_message = "minimal_tls_version must be one of: Tls, Tls11, Tls12."
+  }
 }
 
 variable "disable_local_auth" {
-  description = "Disable local auth keys and require AAD."
+  description = "Disable local auth keys and require AAD (maps to local_authentication_disabled)."
   type        = bool
-  default     = false
 }
 
 variable "public_network_access_enabled" {
   description = "Enable public network access to the Cosmos account."
   type        = bool
-  default     = false
 }
 
 variable "automatic_failover_enabled" {
   description = "Enable automatic failover between regions."
   type        = bool
-  default     = true
+}
+
+variable "additional_read_locations" {
+  description = "Optional additional read regions in priority order (failover priority starts at 1)."
+  type        = list(string)
 }
 
 variable "enable_serverless" {
-  description = "Enable serverless capability."
+  description = "Enable serverless capability ('EnableServerless' capability)."
   type        = bool
-  default     = true
+}
+
+# Consistency policy
+variable "consistency_level" {
+  description = "Session | Strong | BoundedStaleness | ConsistentPrefix | Eventual."
+  type        = string
+  validation {
+    condition     = contains(["Session","Strong","BoundedStaleness","ConsistentPrefix","Eventual"], var.consistency_level)
+    error_message = "consistency_level must be one of: Session, Strong, BoundedStaleness, ConsistentPrefix, Eventual."
+  }
+}
+
+variable "consistency_max_interval_seconds" {
+  description = "Max interval (BoundedStaleness). Ignored by other levels."
+  type        = number
+}
+
+variable "consistency_max_staleness_prefix" {
+  description = "Max staleness prefix (BoundedStaleness). Ignored by other levels."
+  type        = number
+}
+
+# Backup (azurerm v4 flat shape)
+variable "backup_type" {
+  description = "Backup type: Periodic, Continuous7Days, Continuous30Days."
+  type        = string
+  validation {
+    condition     = contains(["Periodic","Continuous7Days","Continuous30Days"], var.backup_type)
+    error_message = "backup_type must be one of: Periodic, Continuous7Days, Continuous30Days."
+  }
 }
 
 variable "backup_interval_minutes" {
-  description = "Periodic backup interval in minutes."
+  description = "For Periodic backups: interval in minutes."
   type        = number
-  default     = 240
 }
 
 variable "backup_retention_hours" {
-  description = "How long backups are retained (hours)."
+  description = "For Periodic backups: retention in hours."
   type        = number
-  default     = 8
 }
 
 variable "backup_storage_redundancy" {
-  description = "Storage redundancy for backups. One of: Local, Zone, Geo."
+  description = "Backup redundancy: Local | Zone | Geo."
   type        = string
-  default     = "Geo"
   validation {
-    condition     = contains(["Local", "Zone", "Geo"], var.backup_storage_redundancy)
+    condition     = contains(["Local","Zone","Geo"], var.backup_storage_redundancy)
     error_message = "backup_storage_redundancy must be one of: Local, Zone, Geo."
   }
 }
 
-# Map-of-objects for DBs/containers
-# Example in tfvars:
-# databases = {
-#   db1 = {
-#     name = "app-db"
-#     containers = {
-#       ResumeContainer = {
-#         partition_key_path    = "/applicant_id"
-#         partition_key_version = 2
-#         indexing_included     = ["/*"]
-#         indexing_excluded     = ["/\"_etag\"/?"]
-#       }
-#     }
-#   }
-# }
+# Databases & containers
 variable "databases" {
-  description = "Map of databases and their containers."
+  description = "Map of SQL databases and their containers."
   type = map(object({
     name       = string
     containers = map(object({
@@ -91,5 +124,4 @@ variable "databases" {
       indexing_excluded     = list(string)
     }))
   }))
-  default = {}
 }

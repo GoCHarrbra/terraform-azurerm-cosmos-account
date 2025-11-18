@@ -3,27 +3,34 @@ resource "azurerm_cosmosdb_account" "this" {
   resource_group_name = var.rg_name
   location            = var.location
 
-  kind       = "GlobalDocumentDB"
-  offer_type = "Standard"
+  kind       = var.kind
+  offer_type = var.offer_type
 
   automatic_failover_enabled     = var.automatic_failover_enabled
   public_network_access_enabled  = var.public_network_access_enabled
-  minimal_tls_version            = "TLS1_2"
-
-  # v4 attribute name
+  minimal_tls_version            = var.minimal_tls_version
   local_authentication_disabled  = var.disable_local_auth
 
   # Consistency
   consistency_policy {
-    consistency_level       = "Session"
-    max_interval_in_seconds = 5
-    max_staleness_prefix    = 100
+    consistency_level       = var.consistency_level
+    max_interval_in_seconds = var.consistency_max_interval_seconds
+    max_staleness_prefix    = var.consistency_max_staleness_prefix
   }
 
   # Primary write region
   geo_location {
     location          = var.location
     failover_priority = 0
+  }
+
+  # Optional read regions (failover priority starts at 1)
+  dynamic "geo_location" {
+    for_each = var.additional_read_locations
+    content {
+      location          = geo_location.value
+      failover_priority = index(var.additional_read_locations, geo_location.value) + 1
+    }
   }
 
   # Optional serverless capability
@@ -34,9 +41,9 @@ resource "azurerm_cosmosdb_account" "this" {
     }
   }
 
-  # v4 backup shape (no nested periodic block)
+  # Backup (v4 flat shape)
   backup {
-    type                 = "Periodic"
+    type                 = var.backup_type
     interval_in_minutes  = var.backup_interval_minutes
     retention_in_hours   = var.backup_retention_hours
     storage_redundancy   = var.backup_storage_redundancy
@@ -45,7 +52,7 @@ resource "azurerm_cosmosdb_account" "this" {
   tags = var.tags
 }
 
-# Key the databases by their declared name so containers can reference by name
+# Key DBs by their declared name so containers can reference by name
 locals {
   dbs_by_name = { for _, v in var.databases : v.name => v }
 }
@@ -74,11 +81,11 @@ locals {
 }
 
 resource "azurerm_cosmosdb_sql_container" "container" {
-  for_each              = local.containers
-  name                  = each.value.container_name
-  resource_group_name   = var.rg_name
-  account_name          = azurerm_cosmosdb_account.this.name
-  database_name         = azurerm_cosmosdb_sql_database.db[each.value.db_name].name
+  for_each            = local.containers
+  name                = each.value.container_name
+  resource_group_name = var.rg_name
+  account_name        = azurerm_cosmosdb_account.this.name
+  database_name       = azurerm_cosmosdb_sql_database.db[each.value.db_name].name
 
   partition_key_path    = each.value.partition_key_path
   partition_key_version = each.value.partition_key_version
