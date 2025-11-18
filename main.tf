@@ -43,10 +43,10 @@ resource "azurerm_cosmosdb_account" "this" {
 
   # Backup (v4 flat shape)
   backup {
-    type                 = var.backup_type
-    interval_in_minutes  = var.backup_interval_minutes
-    retention_in_hours   = var.backup_retention_hours
-    storage_redundancy   = var.backup_storage_redundancy
+    type                = var.backup_type
+    interval_in_minutes = var.backup_interval_minutes
+    retention_in_hours  = var.backup_retention_hours
+    storage_redundancy  = var.backup_storage_redundancy
   }
 
   tags = var.tags
@@ -87,7 +87,8 @@ resource "azurerm_cosmosdb_sql_container" "container" {
   account_name        = azurerm_cosmosdb_account.this.name
   database_name       = azurerm_cosmosdb_sql_database.db[each.value.db_name].name
 
-  partition_key_path    = each.value.partition_key_path
+  # v4 change: use a LIST of paths
+  partition_key_paths   = [each.value.partition_key_path]
   partition_key_version = each.value.partition_key_version
 
   indexing_policy {

@@ -46,7 +46,7 @@ variable "cosmos" {
 }
 
 module "cosmos" {
-  source = "github.com/GoCHarrbra/terraform-azurerm-cosmos-account.git?ref=v0.3.0"
+  source = "github.com/GoCHarrbra/terraform-azurerm-cosmos-account.git?ref=v0.4.0"
 
   rg_name                       = var.cosmos.rg_name
   location                      = var.cosmos.location
