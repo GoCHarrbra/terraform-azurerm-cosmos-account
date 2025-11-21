@@ -93,17 +93,3 @@ output "account_name" {
   value       = module.cosmos.account_name
 }
 
-output "rg_name" {
-  description = "Resource group used for the Cosmos account."
-  value       = module.cosmos.rg_name
-}
-
-output "location" {
-  description = "Location used for the Cosmos account."
-  value       = module.cosmos.location
-}
-
-output "tags" {
-  description = "Tags applied to the Cosmos account."
-  value       = module.cosmos.tags
-}
