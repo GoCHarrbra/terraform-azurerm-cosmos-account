@@ -18,18 +18,18 @@ variable "cosmos_rbac" {
 locals {
   cosmos_builtin_data_contributor_guid = "00000000-0000-0000-0000-000000000002"
 
-  cosmos_data_contributor_role_id = "${module.cosmos.account_id}/sqlRoleDefinitions/${local.cosmos_builtin_data_contributor_guid}"
+  cosmos_data_contributor_role_id = "${module.cosmos.cosmos_account_id}/sqlRoleDefinitions/${local.cosmos_builtin_data_contributor_guid}"
 }
 
 resource "azurerm_cosmosdb_sql_role_assignment" "data_contributor" {
   name = uuid()
 
-  resource_group_name = module.cosmos.rg_name
-  account_name        = module.cosmos.account_name
+  resource_group_name = module.cosmos.cosmos_rg_name
+  account_name        = module.cosmos.cosmos_account_name
 
   # Data-plane role definition & scope
   role_definition_id = local.cosmos_data_contributor_role_id
-  scope              = module.cosmos.account_id
+  scope              = module.cosmos.cosmos_account_id
 
   # Principal getting the data-plane permissions
   principal_id = var.cosmos_rbac.principal_id
@@ -39,3 +39,4 @@ output "cosmos_data_contributor_assignment_id" {
   description = "Cosmos SQL data-plane role assignment id."
   value       = azurerm_cosmosdb_sql_role_assignment.data_contributor.id
 }
+
