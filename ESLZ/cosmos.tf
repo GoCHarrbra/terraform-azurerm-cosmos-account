@@ -65,6 +65,9 @@ module "cosmos" {
   disable_local_auth            = var.cosmos.disable_local_auth
   public_network_access_enabled = var.cosmos.public_network_access_enabled
 
+  # CKV Azure 132 -- Disabling the management plane changes
+  key_based_metadata_write_access_enabled = var.cosmos.key_based_metadata_write_access_enabled
+
   # Resiliency / capacity
   automatic_failover_enabled    = var.cosmos.automatic_failover_enabled
   enable_serverless             = var.cosmos.enable_serverless
@@ -110,6 +113,7 @@ output "cosmos_tags" {
   description = "Tags applied to the Cosmos account."
   value       = module.cosmos.cosmos_tags
 }
+
 
 
 
