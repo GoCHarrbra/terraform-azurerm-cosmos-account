@@ -11,6 +11,9 @@ resource "azurerm_cosmosdb_account" "this" {
   minimal_tls_version            = var.minimal_tls_version
   local_authentication_disabled  = var.disable_local_auth
 
+  #Satisfy Azure CKV 132
+  key_based_metadata_write_access_enabled = var.key_based_metadata_write_access_enabled
+
   # Consistency
   consistency_policy {
     consistency_level       = var.consistency_level
@@ -104,3 +107,4 @@ resource "azurerm_cosmosdb_sql_container" "container" {
     }
   }
 }
+
