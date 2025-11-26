@@ -20,6 +20,9 @@ cosmos = {
   disable_local_auth            = true        # AAD-only (maps to local_authentication_disabled)
   public_network_access_enabled = false
 
+  #CKV Azure 132
+  key_based_metadata_write_access_enabled = false
+
   # Resiliency & capacity
   automatic_failover_enabled = true
   enable_serverless          = true
@@ -51,3 +54,4 @@ cosmos = {
     }
   }
 }
+
