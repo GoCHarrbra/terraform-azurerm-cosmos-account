@@ -21,7 +21,7 @@ cosmos = {
   public_network_access_enabled = false
 
   #CKV Azure 132
-  key_based_metadata_write_access_enabled = false
+  access_key_metadata_writes_enabled = false
 
   # Resiliency & capacity
   automatic_failover_enabled = true
@@ -54,4 +54,5 @@ cosmos = {
     }
   }
 }
+
 
