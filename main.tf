@@ -12,7 +12,7 @@ resource "azurerm_cosmosdb_account" "this" {
   local_authentication_disabled  = var.disable_local_auth
 
   #Satisfy Azure CKV 132
-  key_based_metadata_write_access_enabled = var.key_based_metadata_write_access_enabled
+  access_key_metadata_writes_enabled = var.access_key_metadata_writes_enabled
 
   # Consistency
   consistency_policy {
@@ -107,4 +107,5 @@ resource "azurerm_cosmosdb_sql_container" "container" {
     }
   }
 }
+
 
