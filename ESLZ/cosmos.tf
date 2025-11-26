@@ -49,7 +49,7 @@ variable "cosmos" {
 }
 
 module "cosmos" {
-  source = "github.com/GoCHarrbra/terraform-azurerm-cosmos-account.git?ref=v0.7.0"
+  source = "github.com/GoCHarrbra/terraform-azurerm-cosmos-account.git?ref=v0.8.0"
 
   rg_name                       = var.cosmos.rg_name
   location                      = var.cosmos.location
@@ -113,6 +113,7 @@ output "cosmos_tags" {
   description = "Tags applied to the Cosmos account."
   value       = module.cosmos.cosmos_tags
 }
+
 
 
 
