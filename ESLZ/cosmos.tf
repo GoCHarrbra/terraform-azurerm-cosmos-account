@@ -16,6 +16,9 @@ variable "cosmos" {
     disable_local_auth             = bool
     public_network_access_enabled  = bool
 
+    # CKV Azure 132
+    key_based_metadata_write_access_enabled = bool
+
     # Resiliency / capacity
     automatic_failover_enabled     = bool
     enable_serverless              = bool
@@ -107,6 +110,7 @@ output "cosmos_tags" {
   description = "Tags applied to the Cosmos account."
   value       = module.cosmos.cosmos_tags
 }
+
 
 
 
