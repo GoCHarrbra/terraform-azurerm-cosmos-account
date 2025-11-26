@@ -125,3 +125,8 @@ variable "databases" {
     }))
   }))
 }
+
+variable "key_based_metadata_write_access_enabled" {
+  description = "Whether key-based clients can modify metadata (DBs/containers). Set to false to restrict management-plane changes and satisfy CKV_AZURE_132."
+  type        = bool
+}
