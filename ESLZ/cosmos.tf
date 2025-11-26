@@ -17,7 +17,7 @@ variable "cosmos" {
     public_network_access_enabled  = bool
 
     # CKV Azure 132
-    key_based_metadata_write_access_enabled = bool
+    access_key_metadata_writes_enabled = bool
 
     # Resiliency / capacity
     automatic_failover_enabled     = bool
@@ -49,7 +49,7 @@ variable "cosmos" {
 }
 
 module "cosmos" {
-  source = "github.com/GoCHarrbra/terraform-azurerm-cosmos-account.git?ref=v0.8.0"
+  source = "github.com/GoCHarrbra/terraform-azurerm-cosmos-account.git?ref=v0.9.0"
 
   rg_name                       = var.cosmos.rg_name
   location                      = var.cosmos.location
@@ -66,7 +66,7 @@ module "cosmos" {
   public_network_access_enabled = var.cosmos.public_network_access_enabled
 
   # CKV Azure 132 -- Disabling the management plane changes
-  key_based_metadata_write_access_enabled = var.cosmos.key_based_metadata_write_access_enabled
+  access_key_metadata_writes_enabled = var.cosmos.access_key_metadata_writes_enabled
 
   # Resiliency / capacity
   automatic_failover_enabled    = var.cosmos.automatic_failover_enabled
@@ -113,6 +113,7 @@ output "cosmos_tags" {
   description = "Tags applied to the Cosmos account."
   value       = module.cosmos.cosmos_tags
 }
+
 
 
 
